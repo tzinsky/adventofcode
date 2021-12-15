@@ -1,0 +1,18 @@
+# General ignores.
+a.out
+a.out_real
+*.bak
+*~
+output
+gen
+.mason
+Mason.lock
+*.ntoks
+*.o
+*.pyc
+*.tmp
+TAGS
+tags
+*.DS_Store
+*.vagrant
+.vscode/
