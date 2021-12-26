@@ -2,6 +2,8 @@ module day1AoC {
     use IO;
     use List;
 
+    config const file = "day1input.txt";
+
 
     proc loadData (fileName:string): list(int) {
         var retList: list (int); 
@@ -78,7 +80,7 @@ module day1AoC {
     {
         var depthData: list (int);
 
-        depthData = loadData("day1input.txt");
+        depthData = loadData(file);
         sonarSweep(depthData);
         sonarWindow(depthData, 3);
 
