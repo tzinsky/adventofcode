@@ -47,9 +47,35 @@ config const debug = true;
         if (debug) then 
             writeln (numbers);
 
-//        var bingoCards = readCards(reader);
         var bingoCards: list ([1..5, 1..5](int,bool));
         var cards = readCards(reader);
+        bingoCards.init(cards); 
+        reader.close();
+        dataFile.close();
+
+        var winners = playBingo (numbers, bingoCards);
+        if debug then {
+            for b in winners {
+                writeln (b, "\n");
+            }
+        }
+
+        if debug then       
+            writeln ("First winning card: \n", winners.first());
+        writeln("First winning card results are: ");
+        calculateResults(winners.first()(0), winners.first()(1));
+
+        if debug then 
+            writeln ("Last winning card:  \n", winners.last());
+        writeln("Last winning card results are:  ");
+        calculateResults(winners.last()(0), winners.last()(1));
+
+    }
+
+    proc playBingo (numbers: list(int), cards: list([1..5, 1..5](int, bool))) {
+        // So we are going to create a list of winning cards 
+        var winningCards:list(([1..5, 1..5](int, bool),int)); 
+        var bingoCards: list([1..5, 1..5](int, bool));
         bingoCards.init(cards); 
         if debug then {
             writeln ("Number of bingo cards: ", bingoCards.size);
@@ -61,36 +87,52 @@ config const debug = true;
                 writeln ("Board sum is: ", sum);
             }
         }
-        reader.close();
-        dataFile.close();
 
-        const (winner, number) = playBingo (numbers, bingoCards);
-        if debug then
-            writeln ("Winning number: ", number, "\nWinning card: ", winner);
-        calculateResults (winner, number); 
-    }
-
-    proc playBingo (numbers: list(int), cards: list([1..5, 1..5](int, bool))) {
-        // So we are going to create a list of winning cards 
-        var winningCards:list(([1..5, 1..5](int, bool),int)); 
         for number in numbers {
-            for card in cards {
+            if debug then 
+                writeln ("Playing number: ", number, "\nNumber of cards to play ", bingoCards.size);
+            for card in bingoCards {
                 for rowCol in {1..5, 1..5} {
                     if (number == card[rowCol](0)) then
                         card[rowCol](1) = true;
                 }
             }
             // Did this number result in a winner? 
-            const (winner,card) = checkWinner(cards);
-            if (winner) then {
-                winningCards.append((card, number));
-                return (card, number);
+            // Can there be multiple winners on a the same number? Yes - yes there can be...  
+            // So we cull them all at once...
+            do {
+                const (winner,card) = checkWinner(bingoCards);
+                if (winner) then {
+                    if debug then
+                        writeln ("Adding winner... ", number);
+                    winningCards.append((card, number));
+                    bingoCards = fixupCardList(bingoCards, card);
+                }                
+            } while winner;
+
+        }
+       
+        return winningCards;
+    }
+
+    proc fixupCardList (cards: list([1..5, 1..5](int, bool)), remove: [1..5, 1..5](int, bool))
+    {
+        var removeNum: int = -1; 
+        var items: list([1..5, 1..5](int, bool));
+        items.init(cards);
+
+        for idx in 0 .. items.size-1 do {
+            if (items.getValue(idx).equals(remove)) then {
+                removeNum = idx;
             }
-        }        
-        halt("No winner found and we are out of numbers");
+        }
+        if (removeNum != -1) then 
+           items.pop (removeNum);
+        return items; 
     }
 
     proc checkWinner (cards : list([1..5,1..5](int,bool))) : (bool, [1..5,1..5] (int,bool)) { 
+
         var emptyCard: [1..5,1..5](int,bool);
         for card in cards {
             // We check each row to see if each number has been picked
