@@ -3,7 +3,6 @@ use List;
 
 config const file = "day5input.txt";
 config const debug = true; 
-config const mapSize = 10;
 
     record coordinate {
         var x: int;
@@ -18,46 +17,69 @@ config const mapSize = 10;
         }
     }
 
-    proc processFile () throws {
+    proc processFile () : list ((2*coordinate())) {
         var dataFile = open(file, iomode.r);
         var reader = dataFile.reader();
-        var lines: list ((coordinate(), coordinate()));
-//        var lines:list (((int,int),(int,int)));
-//        var lines: list ((coordinate(), coordinate()));
+        var lines: list ((2*coordinate()));
         var p1, p2: coordinate();
         var endOfFile: bool = false;
-        var validData: bool;  
         do {
             try { 
                 p1 =  new coordinate();
                 p2 =  new coordinate();
-                validData = reader.read (p1);
-                if (validData) {
-                    writeln ("Left = ", p1);
-                    writeln ("P1:  ", p1.x, ", ", p1.y);
-                    reader.readLiteral("->");
-                    validData = reader.read (p2);
-                    if (validData) {
-                        writeln ("Right = ", p2);
-                        //store P1 and P2
-                        lines.append ((p1,p2));
-                    } else {
-                        endOfFile = true;
-                    }
-                } else {
-                    endOfFile = true;
-                }
-            } catch e:EofError {
-                writeln("End of File found");
+                p1 = reader.read (coordinate());
+                reader.readLiteral("->");
+                p2 = reader.read (coordinate());
+                lines.append ((p1,p2));
+            } catch  {
                 endOfFile = true; 
             }
         } while (!endOfFile);
-
         reader.close();
         dataFile.close();
+        return lines; 
+    }
 
+    proc mapSize (lines: list((2*coordinate()))): (2*int) {
+        var x, y: int = 0;
+        for line in lines {
+            x = max(x, max(line[0].x, line[1].x));
+            y = max(y, max(line[0].y, line[1].y));
+        }
+        if debug then
+            writeln (" max x: ", x," max y: ", y); 
+        return ((x, y));
+    }
+
+    proc plotLines (lines: list((2*coordinate())), mapDims:(2*int), bDiagonals: bool) {
+
+        var map: [0..mapDims[0], 0.. mapDims[1]] int; 
+
+        for line in lines {
+            if (((line[0].x == line[1].x || line[0].y == line[1].y )) || bDiagonals) {
+                    if debug then
+                        writeln ("Drawing line: ", line);
+
+                if (line[0].x != line[1].x) {
+                    for x in min(line[0].x, line[1].x)..max(line[0].x, line[1].x) {
+                        map[x, line[0].y] += 1;
+                    }
+                } else {
+                    for y in min(line[0].y, line[1].y)..max(line[0].y, line[1].y) {
+                        map[line[0].x, y] += 1;
+                    }
+                }
+            }
+        }
+        if debug then
+            writeln (map);
+        var overlap: int = + reduce [rc in {0..mapDims[0], 0.. mapDims[1]}] if map[rc]>1 then 1 else 0;
+        writeln ("Intersections: ", overlap); 
     }
 
     proc main () {
-        processFile();
+        var lines: list ((2*coordinate()));
+        lines = processFile();
+        var mapDims = mapSize(lines);
+        plotLines(lines, mapDims, false);
     }
