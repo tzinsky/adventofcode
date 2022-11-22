@@ -88,22 +88,12 @@ config const debug = true;
 
         for line in lines {
             if (((line[0].x == line[1].x || line[0].y == line[1].y )) || bDiagonals) {
-                    if debug then
-                        writeln ("Drawing line: ", line);
-                    var points = buildLine(line); 
-                    for  pt in points do {
-                        map [pt.x, pt.y] +=1;
-                    }
-//
-//                if (line[0].x != line[1].x) {
-//                    for x in min(line[0].x, line[1].x)..max(line[0].x, line[1].x) {
-//                       map[x, line[0].y] += 1;
-//                    }
-//                } else {
-//                    for y in min(line[0].y, line[1].y)..max(line[0].y, line[1].y) {
-//                        map[line[0].x, y] += 1;
-//                    }
-//                }
+                if debug then
+                    writeln ("Drawing line: ", line);
+                var points = buildLine(line); 
+                for  pt in points do {
+                    map [pt.x, pt.y] +=1;
+                }
             }
         }
         if debug then
