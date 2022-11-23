@@ -49,9 +49,36 @@ config const debug = true;
         return costs;
     }
 
+    proc calcExpFuelCosts (crabPos: list (int)) : [] int {
+        var maxPos = max reduce crabPos;
+        if debug then 
+            writeln ("Highest Position Number ", maxPos);
+
+        var costs : [0..maxPos] int;
+
+        for crab in crabPos do { 
+            for pos in 0..maxPos do {
+                var n = abs (crab - pos);
+                costs[pos] += n*(n+1)/2; 
+            }
+        }
+        if debug {
+            for pos in 0..maxPos do {
+                writeln ("Position ",pos," Cost: ", costs[pos]);
+            }
+
+        } 
+        return costs;
+
+    }
+
     proc main () {
         var crabPos: list (int) = processFile();
         var costs = calcFuelCosts (crabPos); 
         var (minCost, minLoc) = minloc reduce zip(costs, costs.domain);
         writeln ("Lowest cost: ", minCost, " at location: ", minLoc); 
+        costs = calcExpFuelCosts (crabPos);
+        (minCost, minLoc) = minloc reduce zip (costs, costs.domain);
+        writeln ("New Lowest cost: ", minCost, " at location: ", minLoc); 
+
     }
