@@ -4,6 +4,7 @@ use Sort;
 
 config const file = "day1input.txt";
 config const debug = true; 
+config const elves = 3; 
 
     proc processFile (){
         var eof:int = 0;
@@ -35,7 +36,7 @@ config const debug = true;
 
         writeln (calList);
         writeln ("Max Calories: ", maxCals);
-        writeln ("Top 3 max cals: ", calList[0] + calList[1] + calList[2]);
+        writeln ("Top 3 max cals: ", +reduce [e in 0..<elves] calList[e]);
         reader.close();
         dataFile.close();
 
