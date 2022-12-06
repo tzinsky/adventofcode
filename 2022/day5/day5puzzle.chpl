@@ -5,6 +5,29 @@ config const file = "day5input.txt";
 config const debug = true; 
 
 
+    proc cargo9000Crane (crates: [] list(string), instructions:list([0..2] int)) {
+
+        for inst in instructions {
+            if debug then 
+                writeln ("Moving ", inst[0], " crates from ", inst[1], " to ", inst[2]);
+            for m in 0..<inst[0] {
+                crates[inst[2]].insert(0,crates[inst[1]].pop(0));
+                if debug then
+                  writeln (crates);            
+            }
+        }
+        writeln (crates);
+        write ("Top of each stack spells: ");
+        for p in 1..crates.size {
+            write (crates[p].first());
+        } 
+        writeln();
+    }
+
+    proc cargo9001Crane (crates:[] list (string), instructions:list([0..2] int)) {
+
+    }
+
     proc processFile (){
         var stacks: list(string);
         var crates:string; 
@@ -39,21 +62,16 @@ config const debug = true;
         if debug then
             writeln (arrayOfLists);
 
+        var instructions: list([0..2] int);
         var mvCount, fromStack, toStack: int;
         while (reader.readf("move %i from %i to %i\n", mvCount, fromStack, toStack)) {
-            writeln ("Moving ", mvCount, " crates from ", fromStack, " to ", toStack);
-            for m in 0..<mvCount {
-                arrayOfLists[toStack].insert(0,arrayOfLists[fromStack].pop(0));
-                if debug then
-                  writeln (arrayOfLists);            
-            }
+            instructions.append([mvCount, fromStack, toStack]);
         }
-        writeln (arrayOfLists);
-        write ("Top of each stack spells: ");
-        for p in 1..stackCount {
-            write (arrayOfLists[p].first());
-        } 
-        writeln();
+
+        cargo9000Crane(arrayOfLists, instructions);
+
+
+        
         reader.close();
         dataFile.close();
 
