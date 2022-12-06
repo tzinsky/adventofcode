@@ -4,9 +4,18 @@ use List;
 config const file = "day5input.txt";
 config const debug = true; 
 
+    proc dumpResults (crates: [] list(string)) {
+        writeln (crates);
+        write ("Top of each stack spells: ");
+        for p in 1..crates.size {
+            write (crates[p].first());
+        } 
+        writeln();
+    }
 
-    proc cargo9000Crane (crates: [] list(string), instructions:list([0..2] int)) {
+    proc cargo9000Crane (startCrates: [] list(string), instructions:list([0..2] int)) {
 
+        var crates: [1..startCrates.size] list(string) = startCrates; 
         for inst in instructions {
             if debug then 
                 writeln ("Moving ", inst[0], " crates from ", inst[1], " to ", inst[2]);
@@ -16,16 +25,23 @@ config const debug = true;
                   writeln (crates);            
             }
         }
-        writeln (crates);
-        write ("Top of each stack spells: ");
-        for p in 1..crates.size {
-            write (crates[p].first());
-        } 
-        writeln();
+        dumpResults(crates);
     }
 
-    proc cargo9001Crane (crates:[] list (string), instructions:list([0..2] int)) {
-
+    proc cargo9001Crane (startCrates:[] list (string), instructions:list([0..2] int)) {
+        var crates: [1..startCrates.size] list(string) = startCrates; 
+        for inst in instructions {
+            if debug then 
+                writeln ("Moving ", inst[0], " crates from ", inst[1], " to ", inst[2]);
+            var c2m: list(string) = new list(string);
+            for m in 0..<inst[0] {
+                c2m.append(crates[inst[1]].pop(0));
+            }
+            crates[inst[2]].insert(0,c2m);
+            if debug then
+                writeln (crates);            
+        }
+        dumpResults(crates);
     }
 
     proc processFile (){
@@ -69,9 +85,8 @@ config const debug = true;
         }
 
         cargo9000Crane(arrayOfLists, instructions);
-
-
-        
+        cargo9001Crane(arrayOfLists, instructions);
+      
         reader.close();
         dataFile.close();
 
