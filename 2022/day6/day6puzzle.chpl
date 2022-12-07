@@ -14,26 +14,29 @@ config const debug = true;
         return retString; 
     }
 
-    proc findMarker (str:string): int {
+    proc repeatChars (str:string): bool {
+        var strSet: set (string); 
+        for ch in str.items() {
+            strSet.add (ch);
+        }
+        return (strSet.size == str.size);
+    }
+
+    proc findMarker (str:string, winSize:int): int {
         var marker: int = -1; 
         var window:string; 
         var match: bool; 
         for idx in 0..<str.size {
-            if (idx+4<str.size) {
-                window = str.this(idx..<idx+4);
-                writeln ("Character for ", str[idx], " Window to check: ", window);
+            if (idx+winSize<str.size) {
+                window = str.this(idx..<idx+winSize);
+                if (debug) then 
+                    writeln ("Character for ", str[idx], " Window to check: ", window);
                 // Determine if repeated characters within this window 
-                match = false; 
-                for ch in window.items() {
-                    if (window.count(ch) > 1) then 
-                        match = true;
-                }
-                // If not - we take the ending index and add 1 to get the answer. 
-                if (!match) {
-                    marker = idx+4;
+                if (repeatChars(window)) {
+                    marker = idx+winSize;
                     break; 
                 }
-
+                // If not - we take the ending index and add 1 to get the answer. 
             }
         }
         return marker;
@@ -44,6 +47,8 @@ config const debug = true;
         var dataStream: string = processFile();
         if debug then 
             writeln (dataStream);
-        var marker: int = findMarker (dataStream);
+        var marker: int = findMarker (dataStream, 4);
         writeln ("Marker is after character: ", marker);
+        var msgMarker: int = findMarker (dataStream, 14);
+        writeln ("Message marker is after character: ", msgMarker);
     }
