@@ -4,6 +4,9 @@ use List;
 config const file = "day7input.txt";
 config const debug = true; 
 config const sizeThreshold = 100000;
+config const totalDriveSpace = 70000000;
+config const updateSpace = 30000000;
+ 
 
     class Directory {
         var name: string;
@@ -61,8 +64,13 @@ config const sizeThreshold = 100000;
         var thresholdTotal = findSumOfDirectoriesUnderSize (driveLayout, sizeThreshold);
         writeln ("Directory totals under Threshold:   ", thresholdTotal);
 
-    }
+        var availableSpace = totalDriveSpace - driveLayout.totalDirectorySize;
+        writeln ("Current available space: ", availableSpace);
+        var deleteSize = findSpaceforUpdate(driveLayout, updateSpace-availableSpace);
+        writeln ("Directory size to be deleted: ", deleteSize);
 
+    }
+    
     proc printDirectory(dir:borrowed Directory?, indent:int) {
 
         for i in 0..<indent {
@@ -90,6 +98,17 @@ config const sizeThreshold = 100000;
                 retTotal += subDir.totalDirectorySize;
             }
          } 
+        return retTotal;
+    }
+
+    proc findSpaceforUpdate (dir: borrowed Directory?, spaceNeeded:int): int {
+        var retTotal: int = updateSpace; 
+        for subDir in dir!.subDirs {
+            retTotal = min (retTotal, findSpaceforUpdate(subDir, spaceNeeded));
+            if ((subDir.totalDirectorySize >= spaceNeeded) && (subDir.totalDirectorySize < retTotal)) {
+                retTotal =subDir.totalDirectorySize;
+            } 
+        }
         return retTotal;
     }
 
