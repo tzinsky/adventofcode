@@ -18,10 +18,10 @@ config const debug = true;
     proc processFile ():[] int {
         var mapLine: string; 
         var treeList: list (string);
-        var dataFile = open(file, iomode.r);
+        var dataFile = open(file, ioMode.r);
         var reader = dataFile.reader();
         while (reader.readLine(mapLine, -1, true)){
-            treeList.append(mapLine);
+            treeList.pushBack(mapLine);
         }
 
         reader.close();
@@ -34,7 +34,7 @@ config const debug = true;
     }
 
     //  Visibility is determined through the following formula: 
-    //      + all trees on the perimeter of the forest (maxRow * maxCol)
+    //      + all trees on the perimeter of the forest 2(maxRow + maxCol)
     //  Then we look at each tree to determine if its visible to left: 
     //      0..<row, col
     //  Above: 
