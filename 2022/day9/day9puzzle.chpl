@@ -6,34 +6,46 @@ use Math;
 config const file = "day9input.txt";
 config const debug = true; 
 
-    proc moveTheRope (moves: list(string)) {
+
+    proc moveTheRope (length: int, moves: list(string)) {
         var tailTouches:set (2*int); 
-        var head, tail: 2*int = (0,0);
-        var x, y: int = 0;
+        var rope: [1..length] (2*int);
+        tailTouches.add(rope.last); 
+
         for move in moves {
+            // Move the front knot
             select (move(0)) {
                 when "R" {
-                    head[0] +=1;
+                    rope[1][0] +=1;
                 }
                 when "L"{
-                    head[0]-= 1;
+                    rope[1][0]-= 1;
                 }
                 when "U" {
-                    head[1] += 1;
+                    rope[1][1] += 1;
                 }
                 when "D" {
-                    head[1] -= 1;
+                    rope[1][1] -= 1;
                 }
             }
-            // Does tail still touch?
-            if ((abs(head[0]-tail[0]) >1) || (abs(head[1] - tail[1]))>1) { 
-                // N: Move tail
-                tail[0] += sgn(head[0]-tail[0]);
-                tail[1] += sgn(head[1]-tail[1]);
+            // Move the follow up knots
+            for i in 1..length-1 {
+                if ((abs(rope[i][0]-rope[i+1][0])>1) || (abs(rope[i][1] - rope[i+1][1])>1)) {
+                    rope[i+1][0] += sgn(rope[i][0]-rope[i+1][0]);
+                    rope[i+1][1] += sgn(rope[i][1]-rope[i+1][1]);
+                }
             }
-            tailTouches.add(tail);
+//            // Does tail still touch?
+//            if ((abs(rope.first[0]-rope.last[0]) >1) || (abs(rope.first[1] - rope.last[1]))>1) { 
+//                // N: Move tail
+//                rope[2][0] += sgn(rope.first[0]-rope.last[0]);
+//                rope[2][1] += sgn(rope.first[1]-rope.last[1]);
+//                writeln (rope.last);
+//            }
+            // Add tail to set
+            tailTouches.add(rope.last);
         }
-        writeln(tailTouches.size);
+        writeln("Tail moves for a rope of length: ", length, " is: ", tailTouches.size);
     }
 
     proc processFile (){
@@ -50,8 +62,9 @@ config const debug = true;
         reader.close();
         dataFile.close();
 
-        moveTheRope(ropeMoves);
+        moveTheRope(2, ropeMoves);
 
+        moveTheRope(10, ropeMoves);
     }
 
     proc main () {
