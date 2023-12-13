@@ -6,7 +6,7 @@ config const debug = true;
 
 
     proc processFile (){
-        var dataFile = open(file, iomode.r);
+        var dataFile = open(file, ioMode.r);
         var reader = dataFile.reader();
 
         reader.close();

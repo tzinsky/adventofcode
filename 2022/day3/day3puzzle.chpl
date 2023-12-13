@@ -6,12 +6,13 @@ use List;
 config const file = "day3input.txt";
 config const debug = true; 
 
-    proc findCommonItem (str1: string, str2: string): string {
+    proc findCommonItem (str1: string, str2: string, str3:string = ""): string {
         var retVal:string;
-        var compareSet = new set (string, str2);
+        var compareSet1 = new set (string, str2);
+        var compareSet2 = new set (string, str3);
         do {
             for ch in str1.items() {
-                if compareSet.contains(ch) then 
+                if (compareSet1.contains(ch) && (compareSet2.contains(ch) || compareSet2.isEmpty())) then 
                     retVal = ch; 
             }
         } while (retVal.isEmpty());
@@ -60,9 +61,27 @@ config const debug = true;
         writeln ("Sum of priorities: ", prioritySum);
 
     }
+    
+    proc identifyElfBadges (sacks:list(string)) {
+        var badgeSum: int = 0;
+        for i in 0..<sacks.size by 3 {
+            if debug { 
+                write ("Elf Grp ", sacks[i]);
+                write (", ", sacks[i+1]);
+                writeln(", ", sacks[i+2]); 
+            }
+            var common = findCommonItem(sacks[i], sacks[i+1], sacks[i+2]);
+            if debug then 
+                writeln ("Common item: ", common, " Int value:  ", convert2Value(common)); 
+            badgeSum += convert2Value(common);
+        }
+        writeln ("Sum of badges: ", badgeSum);
+    }
 
     proc main () {
         var rucksacks:list(string);
         rucksacks = processFile();
         commonCompartments(rucksacks);
+        identifyElfBadges(rucksacks);
+
     }
